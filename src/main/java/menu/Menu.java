@@ -1,6 +1,8 @@
+package menu;
+
 import java.util.Scanner;
 
-public class Menu
+public class Menu implements IMenu
 {
     Scanner scanner = new Scanner(System.in);
 
@@ -35,7 +37,7 @@ public class Menu
     public String mainMenu()
     {
         char selectedOption;
-        while(true)
+        while (true)
         {
             System.out.println("---MENU GŁÓWNE---");
             System.out.println("1. Utwórz nową notatkę");
@@ -53,25 +55,45 @@ public class Menu
                 }
                 case '2' ->
                 {
-                    //TODO wybierz notatkę z bazy
-                    //TODO zwróc ID tej notatki
-                    return "read_" + "ID_NOTATKI";
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA");
+                    return "read_" + selectedNoteID;
                 }
                 case '3' ->
                 {
-                    //TODO wybierz notatkę z bazy
-                    //TODO zwróc ID tej notatki
-                    return "edit_" + "ID_NOTATKI";
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI");
+                    return "edit_" + selectedNoteID;
                 }
-                case 'r' ->
+                case '4' ->
                 {
-                    //TODO wybierz notatkę z bazy
-                    //TODO zwróc ID tej notatki
-                    return "delete_" + "ID_NOTATKI";
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA");
+                    return "delete_" + selectedNoteID;
                 }
                 case '0' -> System.exit(0);
                 default -> System.err.println("Nie ma takiej opcji\n");
             }
         }
+    }
+
+    private String showAndSelectNote(String label)
+    {
+        Long selectedNoteNumber;
+        label = label.toUpperCase();
+        while (true)
+        {
+            System.out.println(label);
+            System.out.println("---LISTA NOTATEK---");
+            Long ammountOfNotes = showNotes();//TODO wyświetl listę notatek tego użytkownika z baz danych, funkcja odrazu zwraca liczbę wszystkich notatek (SELECT)
+            System.out.print("Wybieram: ");
+            selectedNoteNumber = scanner.nextLong();
+            if (selectedNoteNumber < 1 || selectedNoteNumber > ammountOfNotes)
+            {
+                System.err.println("NOTATKA O TAKIM NUMERZE NIE ISTNIEJE.\nSPRÓBUJ PONOWNIE");
+            }
+            else
+            {
+                break;
+            }
+        }
+        return ID_NOTATKI.toString();//TODO bo numer notatki z listy bedzie sie nie zgadzać z id notatki!!!
     }
 }

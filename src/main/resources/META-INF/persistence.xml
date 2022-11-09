@@ -5,5 +5,13 @@
              version="3.0">
     <persistence-unit name="default">
 
+        <class>entity.AccountEntity</class>
+        <class>entity.NoteEntity</class>
+        <properties>
+            <property name="hibernate.connection.url" value="jdbc:postgresql://localhost:5432/notebook"/>
+            <property name="hibernate.connection.driver_class" value="org.postgresql.Driver"/>
+            <property name="hibernate.connection.username" value="postgres"/>
+            <property name="hibernate.connection.password" value="piotrek121460"/>
+        </properties>
     </persistence-unit>
 </persistence>

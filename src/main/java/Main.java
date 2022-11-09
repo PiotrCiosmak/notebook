@@ -1,8 +1,5 @@
-import entity.AccountEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import account.Account;
+import menu.Menu;
 
 import java.util.Objects;
 
@@ -10,12 +7,6 @@ public class Main
 {
     public static void main(String[] args)
     {
-        EntityManagerFactory fac = Persistence.createEntityManagerFactory("default");
-        EntityManager man = fac.createEntityManager();
-        EntityTransaction tr = man.getTransaction();
-
-
-
         Account account = new Account();
         Menu menu = new Menu();
         String loginOption;
@@ -53,7 +44,7 @@ public class Main
         String mainMenuOption;
         String noteOption;
         String noteID;
-/*        while (true)
+        while (true)
         {
             mainMenuOption = menu.mainMenu();
             noteOption = mainMenuOption.substring(0, mainMenuOption.indexOf('_'));
@@ -63,22 +54,21 @@ public class Main
             {
                 case "new" ->
                 {
-
+                    //TODO funkcja tworząco nową notatkę w clasie Note i insert
                 }
                 case "read" ->
                 {
-
+                    //TODO funkcja wyświetlająca treśc nowej notatki z klasy Note
                 }
                 case "edit" ->
                 {
-
+                    //TODO funkcja umożliwiające edycję zawartości notatki w klasie Note i update
                 }
                 case "delete"->
                 {
-
+                    //TODO funkcja usuwająca rekord w bazie delete
                 }
-
             }
-        }*/
+        }
     }
 }

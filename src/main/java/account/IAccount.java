@@ -2,7 +2,7 @@ package account;
 
 public interface IAccount
 {
-    public boolean signIn();
+    public boolean signIn(Long AccountID);
 
-    public boolean register();
+    public boolean register(Long AccountID);
 }

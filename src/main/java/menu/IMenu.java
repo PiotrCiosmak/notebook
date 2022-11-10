@@ -4,5 +4,5 @@ public interface IMenu
 {
     public String loginMenu();
 
-    public String mainMenu();
+    public String mainMenu(Long AccountID);
 }

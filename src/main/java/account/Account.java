@@ -19,7 +19,7 @@ public class Account implements IAccount
         firstName = "empty";
     }
 
-    public boolean signIn()
+    public boolean signIn(Long AccountID)
     {
         System.out.print("Podaj login: ");
         setLogin(scanner.nextLine());
@@ -27,10 +27,10 @@ public class Account implements IAccount
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
 
-        return checkIfDataCorrect();
+        return checkIfDataCorrect(AccountID);
     }
 
-    public boolean register()
+    public boolean register(Long AccountID)
     {
         System.out.print("Podaj login: ");
         setLogin(scanner.nextLine());
@@ -126,10 +126,14 @@ public class Account implements IAccount
         return account.isEmpty();
     }
 
-    private boolean checkIfDataCorrect()
+    private boolean checkIfDataCorrect(Long AccountID)
     {
-        Query q = manager.createNativeQuery("SELECT a.login FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2,getPassword());
+        Query q = manager.createNativeQuery("SELECT a.id_account FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2,getPassword());
         List account = q.getResultList();
+        if(!account.isEmpty())
+        {
+            AccountID = Long.parseLong(account.get(0).toString());
+        }
         return !account.isEmpty();
     }
 
@@ -158,5 +162,4 @@ public class Account implements IAccount
     private static final EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
     private static final EntityManager manager = EntityManagerFactory.createEntityManager();
     private static final EntityTransaction transaction = manager.getTransaction();
-
 }

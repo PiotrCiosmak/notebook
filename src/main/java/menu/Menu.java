@@ -1,5 +1,11 @@
 package menu;
 
+import jakarta.persistence.EntityManager;
+import jakarta.persistence.EntityTransaction;
+import jakarta.persistence.Persistence;
+import jakarta.persistence.Query;
+
+import java.util.List;
 import java.util.Scanner;
 
 public class Menu implements IMenu
@@ -34,7 +40,7 @@ public class Menu implements IMenu
         }
     }
 
-    public String mainMenu()
+    public String mainMenu(Long AccountID)
     {
         char selectedOption;
         while (true)
@@ -55,18 +61,24 @@ public class Menu implements IMenu
                 }
                 case '2' ->
                 {
-                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA");
-                    //return "read_" + selectedNoteID;
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA", AccountID);
+                    if(selectedNoteID.equals("lack"))
+                        return "lack";
+                    return "read_" + selectedNoteID;
                 }
                 case '3' ->
                 {
-                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI");
-                    //return "edit_" + selectedNoteID;
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI", AccountID);
+                    if(selectedNoteID.equals("lack"))
+                        return "lack";
+                    return "edit_" + selectedNoteID;
                 }
                 case '4' ->
                 {
-                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA");
-                    //return "delete_" + selectedNoteID;
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA", AccountID);
+                    if(selectedNoteID.equals("lack"))
+                        return "lack";
+                    return "delete_" + selectedNoteID;
                 }
                 case '0' -> System.exit(0);
                 default -> System.err.println("Nie ma takiej opcji\n");
@@ -74,7 +86,7 @@ public class Menu implements IMenu
         }
     }
 
-    /*private String showAndSelectNote(String label)
+    private String showAndSelectNote(String label, Long AccountID)
     {
         Long selectedNoteNumber;
         label = label.toUpperCase();
@@ -82,10 +94,14 @@ public class Menu implements IMenu
         {
             System.out.println(label);
             System.out.println("---LISTA NOTATEK---");
-            Long ammountOfNotes = showNotes();//TODO wyświetl listę notatek tego użytkownika z baz danych, funkcja odrazu zwraca liczbę wszystkich notatek (SELECT)
+            Long amountOfNotes = showNotes(AccountID);
+            if(amountOfNotes == 0L)
+            {
+                return "lack";
+            }
             System.out.print("Wybieram: ");
             selectedNoteNumber = scanner.nextLong();
-            if (selectedNoteNumber < 1 || selectedNoteNumber > ammountOfNotes)
+            if (selectedNoteNumber < 1 || selectedNoteNumber > amountOfNotes)
             {
                 System.err.println("NOTATKA O TAKIM NUMERZE NIE ISTNIEJE.\nSPRÓBUJ PONOWNIE");
             }
@@ -94,6 +110,31 @@ public class Menu implements IMenu
                 break;
             }
         }
-        return ID_NOTATKI.toString();//TODO bo numer notatki z listy bedzie sie nie zgadzać z id notatki!!!
-    }*/
+        Long selectedNoteID=selectNoteID(selectedNoteNumber, AccountID);
+        return selectedNoteID.toString();
+    }
+
+    private Long showNotes(Long AccountID)
+    {
+        Query q = manager.createNativeQuery("SELECT n.title FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
+        List note = q.getResultList();
+        if(note.isEmpty())
+        {
+            return 0L;
+        }
+        for (int i = 0; i <= note.size(); ++i)
+            System.out.println(i + "." + note.get(0).toString());
+        return Long.parseLong(String.valueOf(note.size()));
+    }
+
+    private Long selectNoteID(Long selectedNoteNumber,Long AccountID)
+    {
+        Query q = manager.createNativeQuery("SELECT n.id_account FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
+        List note = q.getResultList();
+        return Long.parseLong(note.get(Integer.parseInt(String.valueOf(selectedNoteNumber))).toString());
+    }
+
+    private static final jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+    private static final EntityManager manager = EntityManagerFactory.createEntityManager();
+    private static final EntityTransaction transaction = manager.getTransaction();
 }

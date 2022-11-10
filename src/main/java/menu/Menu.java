@@ -55,18 +55,18 @@ public class Menu implements IMenu
                 }
                 case '2' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA");
-                    return "read_" + selectedNoteID;
+                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA");
+                    //return "read_" + selectedNoteID;
                 }
                 case '3' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI");
-                    return "edit_" + selectedNoteID;
+                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI");
+                    //return "edit_" + selectedNoteID;
                 }
                 case '4' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA");
-                    return "delete_" + selectedNoteID;
+                    //String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA");
+                    //return "delete_" + selectedNoteID;
                 }
                 case '0' -> System.exit(0);
                 default -> System.err.println("Nie ma takiej opcji\n");
@@ -74,7 +74,7 @@ public class Menu implements IMenu
         }
     }
 
-    private String showAndSelectNote(String label)
+    /*private String showAndSelectNote(String label)
     {
         Long selectedNoteNumber;
         label = label.toUpperCase();
@@ -95,5 +95,5 @@ public class Menu implements IMenu
             }
         }
         return ID_NOTATKI.toString();//TODO bo numer notatki z listy bedzie sie nie zgadzać z id notatki!!!
-    }
+    }*/
 }

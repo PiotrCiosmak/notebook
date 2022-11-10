@@ -1,11 +1,9 @@
 package account;
 
 import entity.AccountEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityManagerFactory;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
 
+import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
@@ -29,20 +27,15 @@ public class Account implements IAccount
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
 
-        if (checkIfDataCorrect())//TODO funkcja sprawdza czy istnieje taki login jesli tak to porownuje zahaszowane hasła jeśli sie zgadza to zwraca true jestli cos nie to false
-        {
-            return true;
-        }
-        else
-        {
-            return false;
-        }
+        return checkIfDataCorrect();
     }
 
     public boolean register()
     {
         System.out.print("Podaj login: ");
         setLogin(scanner.nextLine());
+        if (!checkIfLoginIsNotInDatabase())
+            return false;
 
         while (true)
         {
@@ -60,30 +53,23 @@ public class Account implements IAccount
 
         System.out.print("Podaj imie: ");
         setFirstName(scanner.nextLine());
-        if (checkIfLoginIsNotInDatabase())//TODO funkcja sprawdza czy taki login został już uzyty w bazie jesli nie to zwraca true jeśli tak to zwraca false
+        try
         {
-            try
+            transaction.begin();
+            AccountEntity account = new AccountEntity();
+            account.setLogin(login);
+            account.setPassword(password);
+            account.setName(firstName);
+            manager.persist(account);
+            transaction.commit();
+        } finally
+        {
+            if (transaction.isActive())
             {
-                transaction.begin();
-                AccountEntity account = new AccountEntity();
-                account.setLogin(login);
-                account.setPassword(password);
-                account.setName(firstName);
-                manager.persist(account);
-                transaction.commit();
-            } finally
-            {
-                if (transaction.isActive())
-                {
-                    transaction.rollback();
-                }
-                manager.close();
-                EntityManagerFactory.close();
+                transaction.rollback();
             }
-        }
-        else
-        {
-            return false;
+            manager.close();
+            EntityManagerFactory.close();
         }
         return true;
     }
@@ -105,15 +91,15 @@ public class Account implements IAccount
 
     public void setPassword(String password)
     {
-        hash();//TODO hash
+        //hash();//TODO hash
         this.password = password;
     }
 
     public boolean setNewPassword(String password)
     {
-        if (checkIfPasswordIsStringEnough())
+        if (checkIfPasswordIsStringEnough(password))
         {
-            hash();//TODO hash
+            //hash();//TODO hash
             this.password = password;
             return true;
         }
@@ -133,7 +119,21 @@ public class Account implements IAccount
         this.firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
     }
 
-    private boolean checkIfPasswordIsStringEnough()
+    private boolean checkIfLoginIsNotInDatabase()
+    {
+        Query q = manager.createNativeQuery("SELECT a.login FROM Account a WHERE a.login = ?").setParameter(1, getLogin());
+        List account = q.getResultList();
+        return account.isEmpty();
+    }
+
+    private boolean checkIfDataCorrect()
+    {
+        Query q = manager.createNativeQuery("SELECT a.login FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2,getPassword());
+        List account = q.getResultList();
+        return !account.isEmpty();
+    }
+
+    private boolean checkIfPasswordIsStringEnough(String password)
     {
         if (password.length() >= 8)
         {

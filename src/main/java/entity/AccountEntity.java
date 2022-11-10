@@ -4,12 +4,6 @@ import jakarta.persistence.*;
 
 import java.util.Collection;
 
-/*@NamedQueries(
-        {
-                @NamedQuery(name="AccountEntity.ByLogin", query = "SELECT a FROM AccountEntity a WHERE a.login=?1 AND a.password=?2")
-        }
-)*/
-
 @Entity
 @Table(name = "account", schema = "public", catalog = "notebook")
 public class AccountEntity
@@ -97,8 +91,9 @@ public class AccountEntity
     }
 
     @Override
-    public String toString(){
-        return "Id="+idAccount+", Login="+login+", password="+password+", name="+name;
+    public String toString()
+    {
+        return "Id=" + idAccount + ", Login=" + login + ", password=" + password + ", name=" + name;
     }
 
     public Collection<NoteEntity> getNotesByIdAccount()

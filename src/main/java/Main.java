@@ -1,5 +1,6 @@
 import account.Account;
 import menu.Menu;
+import note.Note;
 
 import java.util.Objects;
 
@@ -10,14 +11,14 @@ public class Main
         Account account = new Account();
         Menu menu = new Menu();
         String loginOption;
-        Long AccountID = -1L;
+        Long accountID = -1L;
         while (true)
         {
             loginOption = menu.loginMenu();
             if (Objects.equals(loginOption, "sign-in"))
             {
-                boolean signInCorrect = account.signIn(AccountID);
-                if (signInCorrect)
+                accountID = account.signIn();
+                if (accountID != -1L)
                 {
                     System.out.println("ZALOGOWANO");
                     break;
@@ -29,8 +30,8 @@ public class Main
             }
             else if (loginOption.equals("register"))
             {
-                boolean registerCorrect = account.register(AccountID);
-                if (registerCorrect)
+                accountID = account.register();
+                if (accountID != -1L)
                 {
                     System.out.println("ZAREJESTROWANO");
                     break;
@@ -47,10 +48,10 @@ public class Main
         String noteID = null;
         while (true)
         {
-            mainMenuOption = menu.mainMenu(AccountID);
-            if(mainMenuOption.equals("lack"))
+            mainMenuOption = menu.mainMenu(accountID);
+            if (mainMenuOption.equals("lack"))
             {
-                noteOption="lack";
+                noteOption = "lack";
             }
             else if (!mainMenuOption.equals("new"))
             {
@@ -62,13 +63,12 @@ public class Main
                 noteOption = "new";
             }
 
-
+            Note note = new Note();
             switch (noteOption)
             {
                 case "new" ->
                 {
-                    System.out.println("TUTAJ");
-                    //TODO funkcja tworząco nową notatkę w clasie Note i insert
+                    note.createNewNote(accountID);
                 }
                 case "read" ->
                 {

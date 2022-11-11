@@ -19,7 +19,7 @@ public class Account implements IAccount
         firstName = "empty";
     }
 
-    public boolean signIn(Long AccountID)
+    public Long signIn()
     {
         System.out.print("Podaj login: ");
         setLogin(scanner.nextLine());
@@ -27,15 +27,16 @@ public class Account implements IAccount
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
 
-        return checkIfDataCorrect(AccountID);
+        return checkIfDataCorrect();
     }
 
-    public boolean register(Long AccountID)
+    //zwroc ACcountID
+    public Long register()
     {
         System.out.print("Podaj login: ");
         setLogin(scanner.nextLine());
         if (!checkIfLoginIsNotInDatabase())
-            return false;
+            return -1L;
 
         while (true)
         {
@@ -61,6 +62,7 @@ public class Account implements IAccount
             account.setPassword(password);
             account.setName(firstName);
             manager.persist(account);
+            manager.flush();
             transaction.commit();
         } finally
         {
@@ -71,7 +73,7 @@ public class Account implements IAccount
             manager.close();
             EntityManagerFactory.close();
         }
-        return true;
+        return checkIfDataCorrect();
     }
 
     public String getLogin()
@@ -126,15 +128,15 @@ public class Account implements IAccount
         return account.isEmpty();
     }
 
-    private boolean checkIfDataCorrect(Long AccountID)
+    private Long checkIfDataCorrect()
     {
         Query q = manager.createNativeQuery("SELECT a.id_account FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2,getPassword());
         List account = q.getResultList();
         if(!account.isEmpty())
         {
-            AccountID = Long.parseLong(account.get(0).toString());
+            return Long.parseLong(account.get(0).toString());
         }
-        return !account.isEmpty();
+        return -1L;
     }
 
     private boolean checkIfPasswordIsStringEnough(String password)

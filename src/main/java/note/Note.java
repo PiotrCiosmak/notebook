@@ -7,7 +7,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Scanner;
 
-public class Note
+public class Note implements INote
 {
     Scanner scanner = new Scanner(System.in);
 
@@ -37,11 +37,11 @@ public class Note
         while (true)
         {
             System.out.print("Podaj tytuł notatki:");
-            boolean titleCorrect = setTitle(scanner.nextLine());
-            if (titleCorrect)
+            boolean titleLengthCorrect = setTitle(scanner.nextLine());
+            if (titleLengthCorrect)
                 break;
             else
-                System.err.println("TYTUŁ NIE MOŻE MIEĆ WIĘCEJ NIŻ 1000 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
+                System.err.println("TYTUŁ NIE MOŻE BYĆ DŁUŻSZY NIŻ 1000 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
         }
 
         jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
@@ -82,6 +82,11 @@ public class Note
         EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
         EntityManager manager = EntityManagerFactory.createEntityManager();
         manager.createNativeQuery("delete from Note where id_note = 2");
+    }
+
+    public void updateNote(Long noteID)
+    {
+
     }
 
     public String getTitle()

@@ -24,8 +24,15 @@ public class Account implements IAccount
 
     public Long signIn()
     {
-        System.out.print("Podaj login: ");
-        setLogin(scanner.nextLine());
+        while (true)
+        {
+            System.out.print("Podaj login: ");
+            boolean loginLengthCorrect = setLogin(scanner.nextLine());
+            if (loginLengthCorrect)
+                break;
+            else
+                System.err.println("LOGIN NIE MOŻE BYĆ DŁUŻSZY NIŻ 100 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
+        }
 
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
@@ -37,8 +44,15 @@ public class Account implements IAccount
 
     public Long register()
     {
-        System.out.print("Podaj login: ");
-        setLogin(scanner.nextLine());
+        while (true)
+        {
+            System.out.print("Podaj login: ");
+            boolean loginLengthCorrect = setLogin(scanner.nextLine());
+            if (loginLengthCorrect)
+                break;
+            else
+                System.err.println("LOGIN NIE MOŻE BYĆ DŁUŻSZY NIŻ 100 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
+        }
         if (!checkIfLoginIsNotInDatabase())
             return -1L;
 
@@ -49,11 +63,17 @@ public class Account implements IAccount
             if (passwordIsStringEnough)
                 break;
             else
-                System.err.println("PODAJE HASŁO JEST ZBYT SŁABE\nSPRÓBUJ PONOWNIE\n");
+                System.err.println("PODAJE HASŁO JEST ZBYT SŁABE LUB JEST DŁUŻSZE NIZ 100 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
         }
-
-        System.out.print("Podaj imie: ");
-        setFirstName(scanner.nextLine());
+        while (true)
+        {
+            System.out.print("Podaj imie: ");
+            boolean firstNameLengthCorrect = setFirstName(scanner.nextLine());
+            if (firstNameLengthCorrect)
+                break;
+            else
+                System.err.println("IMIE NIE MOŻE BYĆ DŁUŻSZY NIŻ 100 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
+        }
 
         EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
         EntityManager manager = EntityManagerFactory.createEntityManager();
@@ -86,9 +106,12 @@ public class Account implements IAccount
         return login;
     }
 
-    public void setLogin(String login)
+    public boolean setLogin(String login)
     {
+        if (login.length() > 100)
+            return false;
         this.login = login.toLowerCase();
+        return true;
     }
 
     public String getPassword()
@@ -117,6 +140,8 @@ public class Account implements IAccount
 
     private boolean hashAndSetNewPassword(String password)
     {
+        if(password.length()>100)
+            return false;
         if (checkIfPasswordIsStringEnough(password))
         {
             this.password = hash(password);
@@ -133,9 +158,12 @@ public class Account implements IAccount
         return firstName;
     }
 
-    public void setFirstName(String firstName)
+    public boolean setFirstName(String firstName)
     {
+        if (firstName.length() > 100)
+            return false;
         this.firstName = firstName.substring(0, 1).toUpperCase() + firstName.substring(1).toLowerCase();
+        return true;
     }
 
     private boolean checkIfLoginIsNotInDatabase()
@@ -150,9 +178,7 @@ public class Account implements IAccount
     private boolean checkIfPasswordIsCorrect()
     {
         BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
-        boolean xd = bcrypt.matches(password, getHashedPassword());
-        System.out.println(xd);
-        return xd;
+        return bcrypt.matches(password, getHashedPassword());
     }
 
     private Long checkIfDataCorrect()

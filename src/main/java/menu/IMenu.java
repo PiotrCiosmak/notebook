@@ -2,7 +2,7 @@ package menu;
 
 public interface IMenu
 {
-    public String loginMenu();
+    String loginMenu();
 
-    public String mainMenu(Long AccountID);
+    String mainMenu(Long accountID);
 }

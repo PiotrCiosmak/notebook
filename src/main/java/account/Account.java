@@ -142,7 +142,7 @@ public class Account implements IAccount
     {
         if(password.length()>100)
             return false;
-        if (checkIfPasswordIsStringEnough(password))
+        if (checkIfPasswordIsStrongEnough(password))
         {
             this.password = hash(password);
             return true;
@@ -198,7 +198,7 @@ public class Account implements IAccount
         return bCryptPasswordEncoder.encode(password);
     }
 
-    private boolean checkIfPasswordIsStringEnough(String password)
+    private boolean checkIfPasswordIsStrongEnough(String password)
     {
         if (password.length() >= 8)
         {

@@ -39,7 +39,7 @@ public class Menu implements IMenu
         }
     }
 
-    public String mainMenu(Long AccountID)
+    public String mainMenu(Long accountID)
     {
         char selectedOption;
         while (true)
@@ -60,21 +60,21 @@ public class Menu implements IMenu
                 }
                 case '2' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA", AccountID);
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA", accountID);
                     if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "read_" + selectedNoteID;
                 }
                 case '3' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI", AccountID);
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI", accountID);
                     if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "edit_" + selectedNoteID;
                 }
                 case '4' ->
                 {
-                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA", AccountID);
+                    String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA", accountID);
                     if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "delete_" + selectedNoteID;
@@ -85,7 +85,7 @@ public class Menu implements IMenu
         }
     }
 
-    private String showAndSelectNote(String label, Long AccountID)
+    private String showAndSelectNote(String label, Long accountID)
     {
         Long selectedNoteNumber;
         label = label.toUpperCase();
@@ -93,7 +93,7 @@ public class Menu implements IMenu
         {
             System.out.println(label);
             System.out.println("---LISTA NOTATEK---");
-            Long amountOfNotes = showNotes(AccountID);
+            Long amountOfNotes = showNotes(accountID);
             if (amountOfNotes == 0L)
             {
                 return "lack";
@@ -109,13 +109,15 @@ public class Menu implements IMenu
                 break;
             }
         }
-        Long selectedNoteID = selectNoteID(selectedNoteNumber, AccountID);
+        Long selectedNoteID = selectNoteID(selectedNoteNumber, accountID);
         return selectedNoteID.toString();
     }
 
-    private Long showNotes(Long AccountID)
+    private Long showNotes(Long accountID)
     {
-        Query q = manager.createNativeQuery("SELECT n.title FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
+        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        Query q = manager.createNativeQuery("SELECT n.title FROM Note n WHERE n.id_account = ?").setParameter(1, accountID);
         List note = q.getResultList();
         if (note.isEmpty())
         {
@@ -126,14 +128,12 @@ public class Menu implements IMenu
         return Long.parseLong(String.valueOf(note.size()));
     }
 
-    private Long selectNoteID(Long selectedNoteNumber, Long AccountID)
+    private Long selectNoteID(Long selectedNoteNumber, Long accountID)
     {
-        Query q = manager.createNativeQuery("SELECT n.id_note FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
+        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        Query q = manager.createNativeQuery("SELECT n.id_note FROM Note n WHERE n.id_account = ?").setParameter(1, accountID);
         List note = q.getResultList();
         return Long.parseLong(note.get(Integer.parseInt(String.valueOf(selectedNoteNumber)) - 1).toString());
     }
-
-    private static final jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-    private static final EntityManager manager = EntityManagerFactory.createEntityManager();
-    private static final EntityTransaction transaction = manager.getTransaction();
 }

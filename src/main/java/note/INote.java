@@ -2,7 +2,7 @@ package note;
 
 public interface INote
 {
-    void createNewNote(Long AccountID);
+    void createNewNote(Long accountID);
 
     void readNote(Long noteID);
 

@@ -17,7 +17,7 @@ public class Note implements INote
         content = "empty";
     }
 
-    public void createNewNote(Long AccountID)
+    public void createNewNote(Long accountID)
     {
         System.out.println("---NOWA NOTATKA---");
 
@@ -54,7 +54,7 @@ public class Note implements INote
             NoteEntity note = new NoteEntity();
             note.setTitle(title);
             note.setContent(content);
-            note.setIdAccount(AccountID);
+            note.setIdAccount(accountID);
             manager.persist(note);
             transaction.commit();
         } finally

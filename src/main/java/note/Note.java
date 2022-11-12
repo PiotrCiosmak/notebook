@@ -2,7 +2,6 @@ package note;
 
 import entity.NoteEntity;
 import jakarta.persistence.*;
-import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -33,10 +32,17 @@ public class Note
                 break;
             }
         }
-        content = String.join("\n", lines);
+        setContent(String.join("\n", lines));
 
-        System.out.print("Podaj tytuł notatki:");
-        title = scanner.nextLine();
+        while (true)
+        {
+            System.out.print("Podaj tytuł notatki:");
+            boolean titleCorrect = setTitle(scanner.nextLine());
+            if (titleCorrect)
+                break;
+            else
+                System.err.println("TYTUŁ NIE MOŻE MIEĆ WIĘCEJ NIŻ 1000 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
+        }
 
         jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
         EntityManager manager = EntityManagerFactory.createEntityManager();
@@ -83,9 +89,12 @@ public class Note
         return title;
     }
 
-    public void setTitle(String title)
+    public boolean setTitle(String title)
     {
+        if (title.length() > 1000)
+            return false;
         this.title = title;
+        return true;
     }
 
     public String getContent()

@@ -1,7 +1,9 @@
 edycja notatki
 usuwanie notatki
 
-zabezpieczyć zeby tytuł notatki,login,haslo,imie nie był dłuższy niz 1000 znaków
+
+login, password, name max 100
+
 
 diagram klas
 opis struktury (tekstowy)

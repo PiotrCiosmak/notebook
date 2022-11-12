@@ -2,11 +2,14 @@ package account;
 
 import entity.AccountEntity;
 import jakarta.persistence.*;
+import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
+import java.security.SecureRandom;
 import java.util.List;
 import java.util.Scanner;
 import java.util.regex.Matcher;
 import java.util.regex.Pattern;
+
 
 public class Account implements IAccount
 {
@@ -26,11 +29,12 @@ public class Account implements IAccount
 
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
-
+        if (!checkIfPasswordIsCorrect())
+            return -1L;
+        hashAndSetPassword();
         return checkIfDataCorrect();
     }
 
-    //zwroc ACcountID
     public Long register()
     {
         System.out.print("Podaj login: ");
@@ -41,19 +45,20 @@ public class Account implements IAccount
         while (true)
         {
             System.out.print("Podaj hasło: ");
-            boolean passwordIsStringEnough = setNewPassword(scanner.nextLine());
+            boolean passwordIsStringEnough = hashAndSetNewPassword(scanner.nextLine());
             if (passwordIsStringEnough)
-            {
                 break;
-            }
             else
-            {
-                System.err.println("PODAJE HASŁO JEST ZBYT SŁABE\nSPRÓBUJ PONOWNIE");
-            }
+                System.err.println("PODAJE HASŁO JEST ZBYT SŁABE\nSPRÓBUJ PONOWNIE\n");
         }
 
         System.out.print("Podaj imie: ");
         setFirstName(scanner.nextLine());
+
+        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+
         try
         {
             transaction.begin();
@@ -93,16 +98,28 @@ public class Account implements IAccount
 
     public void setPassword(String password)
     {
-        //hash();//TODO hash
         this.password = password;
     }
 
-    public boolean setNewPassword(String password)
+    private String getHashedPassword()
+    {
+        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        Query q = manager.createNativeQuery("SELECT a.password FROM Account a WHERE a.login = ?").setParameter(1, getLogin());
+        List password = q.getResultList();
+        return password.get(0).toString();
+    }
+
+    private void hashAndSetPassword()
+    {
+        this.password = hash(getPassword());
+    }
+
+    private boolean hashAndSetNewPassword(String password)
     {
         if (checkIfPasswordIsStringEnough(password))
         {
-            //hash();//TODO hash
-            this.password = password;
+            this.password = hash(password);
             return true;
         }
         else
@@ -123,35 +140,53 @@ public class Account implements IAccount
 
     private boolean checkIfLoginIsNotInDatabase()
     {
+        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
         Query q = manager.createNativeQuery("SELECT a.login FROM Account a WHERE a.login = ?").setParameter(1, getLogin());
         List account = q.getResultList();
         return account.isEmpty();
     }
 
+    private boolean checkIfPasswordIsCorrect()
+    {
+        BCryptPasswordEncoder bcrypt = new BCryptPasswordEncoder();
+        boolean xd = bcrypt.matches(password, getHashedPassword());
+        System.out.println(xd);
+        return xd;
+    }
+
     private Long checkIfDataCorrect()
     {
-        Query q = manager.createNativeQuery("SELECT a.id_account FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2,getPassword());
+        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        Query q = manager.createNativeQuery("SELECT a.id_account FROM Account a WHERE a.login = ? AND a.password = ?").setParameter(1, getLogin()).setParameter(2, getHashedPassword());
         List account = q.getResultList();
-        if(!account.isEmpty())
-        {
+        if (!account.isEmpty())
             return Long.parseLong(account.get(0).toString());
-        }
         return -1L;
+    }
+
+    private String hash(String password)
+    {
+        BCryptPasswordEncoder bCryptPasswordEncoder = new BCryptPasswordEncoder(12, new SecureRandom());
+        return bCryptPasswordEncoder.encode(password);
     }
 
     private boolean checkIfPasswordIsStringEnough(String password)
     {
         if (password.length() >= 8)
         {
-            Pattern letter = Pattern.compile("[a-zA-z]");
+            Pattern capitalLetter = Pattern.compile("[A-Z]");
+            Pattern lowerLetter = Pattern.compile("[a-z]");
             Pattern digit = Pattern.compile("[0-9]");
             Pattern special = Pattern.compile("[!@#$%&*()_+=|<>?{}\\[\\]~-]");
 
-            Matcher hasLetter = letter.matcher(password);
+            Matcher hasCapitalLetter = capitalLetter.matcher(password);
+            Matcher hasLowerLetter = lowerLetter.matcher(password);
             Matcher hasDigit = digit.matcher(password);
             Matcher hasSpecial = special.matcher(password);
 
-            return hasLetter.find() && hasDigit.find() && hasSpecial.find();
+            return hasCapitalLetter.find() && hasLowerLetter.find() && hasDigit.find() && hasSpecial.find();
         }
         else
             return false;
@@ -160,8 +195,4 @@ public class Account implements IAccount
     private String login;
     private String password;
     private String firstName;
-
-    private static final EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-    private static final EntityManager manager = EntityManagerFactory.createEntityManager();
-    private static final EntityTransaction transaction = manager.getTransaction();
 }

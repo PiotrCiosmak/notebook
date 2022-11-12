@@ -1,9 +1,7 @@
-odczyt notatki
 edycja notatki
 usuwanie notatki
 
-hasło (bcrypt)
-
 zabezpieczyć zeby tytuł notatki,login,haslo,imie nie był dłuższy niz 1000 znaków
 
-i gotowe
+diagram klas
+opis struktury (tekstowy)

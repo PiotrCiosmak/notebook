@@ -1,9 +1,8 @@
 package note;
 
 import entity.NoteEntity;
-import jakarta.persistence.EntityManager;
-import jakarta.persistence.EntityTransaction;
-import jakarta.persistence.Persistence;
+import jakarta.persistence.*;
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -19,7 +18,7 @@ public class Note
         content = "empty";
     }
 
-    public boolean createNewNote(Long AccountID)
+    public void createNewNote(Long AccountID)
     {
         System.out.println("---NOWA NOTATKA---");
 
@@ -39,6 +38,10 @@ public class Note
         System.out.print("Podaj tytuł notatki:");
         title = scanner.nextLine();
 
+        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        EntityTransaction transaction = manager.getTransaction();
+
         try
         {
             transaction.begin();
@@ -57,7 +60,22 @@ public class Note
             manager.close();
             EntityManagerFactory.close();
         }
-        return true;
+    }
+
+    public void readNote(Long noteID)
+    {
+        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        Query q = manager.createNativeQuery("SELECT n.content FROM Note n WHERE n.id_note = ?").setParameter(1, noteID);
+        List note = q.getResultList();
+        System.out.println("ZAWARTOŚĆ:\n" + note.get(0));
+    }
+
+    public void deleteNote(Long noteID)
+    {
+        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        EntityManager manager = EntityManagerFactory.createEntityManager();
+        manager.createNativeQuery("delete from Note where id_note = 2");
     }
 
     public String getTitle()
@@ -82,8 +100,4 @@ public class Note
 
     private String title;
     private String content;
-
-    private static final jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-    private static final EntityManager manager = EntityManagerFactory.createEntityManager();
-    private static final EntityTransaction transaction = manager.getTransaction();
 }

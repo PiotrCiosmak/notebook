@@ -15,7 +15,6 @@ public class Menu implements IMenu
     public String loginMenu()
     {
         char selectedOption;
-
         while (true)
         {
             System.out.println("---MENU LOGOWANIA---");
@@ -35,7 +34,7 @@ public class Menu implements IMenu
                     return "register";
                 }
                 case '0' -> System.exit(0);
-                default -> System.err.println("Nie ma takiej opcji\n");
+                default -> System.err.println("NIE MA TAKIEJ OPCJI\nSPRÓBUJ PONOWNIE\n");
             }
         }
     }
@@ -62,21 +61,21 @@ public class Menu implements IMenu
                 case '2' ->
                 {
                     String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO ODCZYTANIA", AccountID);
-                    if(selectedNoteID.equals("lack"))
+                    if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "read_" + selectedNoteID;
                 }
                 case '3' ->
                 {
                     String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO EDYCJI", AccountID);
-                    if(selectedNoteID.equals("lack"))
+                    if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "edit_" + selectedNoteID;
                 }
                 case '4' ->
                 {
                     String selectedNoteID = showAndSelectNote("WYBIERZ NOTATKĘ DO USUNIĘCIA", AccountID);
-                    if(selectedNoteID.equals("lack"))
+                    if (selectedNoteID.equals("lack"))
                         return "lack";
                     return "delete_" + selectedNoteID;
                 }
@@ -95,7 +94,7 @@ public class Menu implements IMenu
             System.out.println(label);
             System.out.println("---LISTA NOTATEK---");
             Long amountOfNotes = showNotes(AccountID);
-            if(amountOfNotes == 0L)
+            if (amountOfNotes == 0L)
             {
                 return "lack";
             }
@@ -110,7 +109,7 @@ public class Menu implements IMenu
                 break;
             }
         }
-        Long selectedNoteID=selectNoteID(selectedNoteNumber, AccountID);
+        Long selectedNoteID = selectNoteID(selectedNoteNumber, AccountID);
         return selectedNoteID.toString();
     }
 
@@ -118,20 +117,20 @@ public class Menu implements IMenu
     {
         Query q = manager.createNativeQuery("SELECT n.title FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
         List note = q.getResultList();
-        if(note.isEmpty())
+        if (note.isEmpty())
         {
             return 0L;
         }
-        for (int i = 0; i <= note.size(); ++i)
-            System.out.println(i + "." + note.get(0).toString());
+        for (int i = 0; i < note.size(); ++i)
+            System.out.println(i + 1 + "." + note.get(i).toString());
         return Long.parseLong(String.valueOf(note.size()));
     }
 
-    private Long selectNoteID(Long selectedNoteNumber,Long AccountID)
+    private Long selectNoteID(Long selectedNoteNumber, Long AccountID)
     {
-        Query q = manager.createNativeQuery("SELECT n.id_account FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
+        Query q = manager.createNativeQuery("SELECT n.id_note FROM Note n WHERE n.id_account = ?").setParameter(1, AccountID);
         List note = q.getResultList();
-        return Long.parseLong(note.get(Integer.parseInt(String.valueOf(selectedNoteNumber))).toString());
+        return Long.parseLong(note.get(Integer.parseInt(String.valueOf(selectedNoteNumber)) - 1).toString());
     }
 
     private static final jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");

@@ -15,7 +15,7 @@ public class Main
         while (true)
         {
             loginOption = menu.loginMenu();
-            if (Objects.equals(loginOption, "sign-in"))
+            if (loginOption.equals("sign-in"))
             {
                 accountID = account.signIn();
                 if (accountID != -1L)
@@ -25,7 +25,7 @@ public class Main
                 }
                 else
                 {
-                    System.err.println("BŁĘDNE DANE\nSPRÓBUJ PONOWNIE");
+                    System.err.println("BŁĘDNE DANE\nSPRÓBUJ PONOWNIE\n");
                 }
             }
             else if (loginOption.equals("register"))
@@ -38,14 +38,14 @@ public class Main
                 }
                 else
                 {
-                    System.err.println("PODANY LOGIN JEST ZAJĘTY\nSPRÓBUJ PONOWNIE");
+                    System.err.println("PODANY LOGIN JEST ZAJĘTY\nSPRÓBUJ PONOWNIE\n");
                 }
             }
         }
 
         String mainMenuOption;
         String noteOption;
-        String noteID = null;
+        Long noteID = -1L;
         while (true)
         {
             mainMenuOption = menu.mainMenu(accountID);
@@ -56,7 +56,7 @@ public class Main
             else if (!mainMenuOption.equals("new"))
             {
                 noteOption = mainMenuOption.substring(0, mainMenuOption.indexOf('_'));
-                noteID = mainMenuOption.substring(mainMenuOption.indexOf('_') + 1);
+                noteID = Long.parseLong(mainMenuOption.substring(mainMenuOption.indexOf('_') + 1));
             }
             else
             {
@@ -72,6 +72,7 @@ public class Main
                 }
                 case "read" ->
                 {
+                    note.readNote(noteID);
                     //TODO funkcja wyświetlająca treśc nowej notatki z klasy Note select
                 }
                 case "edit" ->
@@ -80,7 +81,7 @@ public class Main
                 }
                 case "delete" ->
                 {
-                    //TODO funkcja usuwająca rekord w bazie delete
+                    note.deleteNote(noteID);
                 }
                 case "lack" ->
                 {

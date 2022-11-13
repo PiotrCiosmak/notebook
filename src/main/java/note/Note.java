@@ -21,8 +21,7 @@ public class Note implements INote
     public void createNewNote(Long accountID)
     {
         System.out.println("---NOWA NOTATKA---");
-
-        System.out.println("Podaj treśc notatki (aby zakończyć wpisz -END-:");
+        System.out.println("Podaj treśc notatki (aby zakończyć wpisz -END-:)");
         List<String> lines = new ArrayList<>();
         while (scanner.hasNextLine())
         {
@@ -45,37 +44,42 @@ public class Note implements INote
                 System.err.println("TYTUŁ NIE MOŻE BYĆ DŁUŻSZY NIŻ 1000 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
         }
 
-        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-        EntityManager manager = EntityManagerFactory.createEntityManager();
-        EntityTransaction transaction = manager.getTransaction();
-
+        Session session = manager.unwrap(org.hibernate.Session.class);
+        NoteEntity note = new NoteEntity();
         try
         {
-            transaction.begin();
-            NoteEntity note = new NoteEntity();
             note.setTitle(title);
             note.setContent(content);
             note.setIdAccount(accountID);
             manager.persist(note);
-            transaction.commit();
+            session.beginTransaction();
+            session.save(note);
+            session.getTransaction().commit();
+            session.close();
         } finally
         {
-            if (transaction.isActive())
-            {
-                transaction.rollback();
-            }
-            manager.close();
-            EntityManagerFactory.close();
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
         }
     }
 
     public void readNote(Long noteID)
     {
-        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-        EntityManager manager = EntityManagerFactory.createEntityManager();
-        Query q = manager.createNativeQuery("SELECT n.content FROM Note n WHERE n.id_note = ?").setParameter(1, noteID);
-        List note = q.getResultList();
-        System.out.println("ZAWARTOŚĆ:\n" + note.get(0));
+        Session session = manager.unwrap(org.hibernate.Session.class);
+        try
+        {
+            session.beginTransaction();
+            NoteEntity selectedNote = session.get(NoteEntity.class,noteID);
+            session.getTransaction().commit();
+            System.out.println("ZAWARTOŚĆ:\n" + selectedNote.getContent());
+            session.close();
+        } finally
+        {
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
+        }
     }
 
     public void deleteNote(Long noteID)
@@ -123,4 +127,6 @@ public class Note implements INote
 
     private String title;
     private String content;
+    private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory("default");//TODO dodać do schematu
+    private static final EntityManager manager = factory.createEntityManager();//TODO dodać do schematu
 }

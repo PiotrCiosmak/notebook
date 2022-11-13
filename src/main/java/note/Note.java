@@ -56,7 +56,6 @@ public class Note implements INote
             session.beginTransaction();
             session.save(note);
             session.getTransaction().commit();
-            session.close();
         } finally
         {
             if (session.getTransaction().isActive())
@@ -75,7 +74,6 @@ public class Note implements INote
             NoteEntity selectedNote = session.get(NoteEntity.class, noteID);
             session.getTransaction().commit();
             System.out.println("ZAWARTOŚĆ:\n" + selectedNote.getContent());
-            session.close();
         } finally
         {
             if (session.getTransaction().isActive())
@@ -104,28 +102,12 @@ public class Note implements INote
     {
         EntityManager manager = factory.createEntityManager();
         Session session = manager.unwrap(org.hibernate.Session.class);
-        NoteEntity selectedNote;
         try
         {
             session.beginTransaction();
-            selectedNote = session.get(NoteEntity.class, noteID);
+            NoteEntity selectedNote = session.get(NoteEntity.class, noteID);
+            selectedNote.setContent(inputNewContent());
             session.getTransaction().commit();
-            session.close();
-        } finally
-        {
-            if (session.getTransaction().isActive())
-                session.getTransaction().rollback();
-            session.close();
-        }
-        manager = factory.createEntityManager();
-        selectedNote.setContent(inputNewContent());
-        session = manager.unwrap(org.hibernate.Session.class);
-        try
-        {
-            session.beginTransaction();
-            session.update(selectedNote);
-            session.getTransaction().commit();
-            System.out.println("NOTATKA ZOSTAŁA ZAPISANA");
         } finally
         {
             if (session.getTransaction().isActive())

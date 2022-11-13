@@ -36,6 +36,8 @@ public class Account implements IAccount
 
         System.out.print("Podaj hasło: ");
         setPassword(scanner.nextLine());
+        if (checkIfLoginIsNotInDatabase())
+            return -1L;
         if (!checkIfPasswordIsCorrect())
             return -1L;
         hashAndSetPassword();

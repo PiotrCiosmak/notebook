@@ -44,6 +44,7 @@ public class Note implements INote
                 System.err.println("TYTUŁ NIE MOŻE BYĆ DŁUŻSZY NIŻ 1000 ZNAKÓW\nSPRÓBUJ PONOWNIE\n");
         }
 
+        EntityManager manager = factory.createEntityManager();
         Session session = manager.unwrap(org.hibernate.Session.class);
         NoteEntity note = new NoteEntity();
         try
@@ -66,11 +67,12 @@ public class Note implements INote
 
     public void readNote(Long noteID)
     {
+        EntityManager manager = factory.createEntityManager();
         Session session = manager.unwrap(org.hibernate.Session.class);
         try
         {
             session.beginTransaction();
-            NoteEntity selectedNote = session.get(NoteEntity.class,noteID);
+            NoteEntity selectedNote = session.get(NoteEntity.class, noteID);
             session.getTransaction().commit();
             System.out.println("ZAWARTOŚĆ:\n" + selectedNote.getContent());
             session.close();
@@ -100,6 +102,36 @@ public class Note implements INote
 
     public void updateNote(Long noteID)
     {
+        EntityManager manager = factory.createEntityManager();
+        Session session = manager.unwrap(org.hibernate.Session.class);
+        NoteEntity selectedNote;
+        try
+        {
+            session.beginTransaction();
+            selectedNote = session.get(NoteEntity.class, noteID);
+            session.getTransaction().commit();
+            session.close();
+        } finally
+        {
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
+        }
+        manager = factory.createEntityManager();
+        selectedNote.setContent(inputNewContent());
+        session = manager.unwrap(org.hibernate.Session.class);
+        try
+        {
+            session.beginTransaction();
+            session.update(selectedNote);
+            session.getTransaction().commit();
+            System.out.println("NOTATKA ZOSTAŁA ZAPISANA");
+        } finally
+        {
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
+        }
     }
 
     public String getTitle()
@@ -125,8 +157,25 @@ public class Note implements INote
         this.content = content;
     }
 
+    private String inputNewContent()//TODO dodać do schematu
+    {
+        System.out.println("Podaj treśc notatki (aby zakończyć wpisz -END-:)");
+        List<String> lines = new ArrayList<>();
+        while (scanner.hasNextLine())
+        {
+            lines.add(scanner.nextLine());
+            if (lines.get(lines.size() - 1).equals("-END-"))
+            {
+                lines.remove(lines.size() - 1);
+                break;
+            }
+        }
+        return String.join("\n", lines);
+
+
+    }
+
     private String title;
     private String content;
     private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory("default");//TODO dodać do schematu
-    private static final EntityManager manager = factory.createEntityManager();//TODO dodać do schematu
 }

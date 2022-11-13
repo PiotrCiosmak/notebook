@@ -26,7 +26,7 @@ public class Note implements INote
         while (scanner.hasNextLine())
         {
             lines.add(scanner.nextLine());
-            if (lines.get(lines.size() - 1).equals("-END-"))
+            if (lines.get(lines.size() - 1).equalsIgnoreCase("-END-"))
             {
                 lines.remove(lines.size() - 1);
                 break;
@@ -67,35 +67,9 @@ public class Note implements INote
     public void readNote(Long noteID)
     {
         EntityManager manager = factory.createEntityManager();
-        Session session = manager.unwrap(org.hibernate.Session.class);
-        try
-        {
-            session.beginTransaction();
-            NoteEntity selectedNote = session.get(NoteEntity.class, noteID);
-            session.getTransaction().commit();
-            System.out.println("ZAWARTOŚĆ:\n" + selectedNote.getContent());
-        } finally
-        {
-            if (session.getTransaction().isActive())
-                session.getTransaction().rollback();
-            session.close();
-        }
-    }
-
-    public void deleteNote(Long noteID)
-    {
-        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
-        EntityManager manager = EntityManagerFactory.createEntityManager();
-        EntityTransaction transaction = manager.getTransaction();
-        Session s = manager.unwrap(org.hibernate.Session.class);
-
-        transaction.begin();
-        Query q = manager.createNativeQuery("SELECT * FROM Note n WHERE n.id_note = ?").setParameter(1, noteID);
-        List<NoteEntity> lista = q.getResultList();
-        manager.remove(lista.get(0));
-        manager.flush();
-        manager.clear();
-        transaction.commit();
+        Query q = manager.createNativeQuery("SELECT n.content FROM Note n WHERE n.id_note = ?").setParameter(1, noteID);
+        List note = q.getResultList();
+        System.out.println("ZAWARTOŚĆ:\n" + note.get(0));
     }
 
     public void updateNote(Long noteID)
@@ -114,6 +88,27 @@ public class Note implements INote
                 session.getTransaction().rollback();
             session.close();
         }
+        System.out.println("NOTATKA ZOSTAŁA ZAKTUALIZOWANA");
+    }
+
+    public void deleteNote(Long noteID)
+    {
+        //NIE DZIAŁA
+        /*EntityManager manager = factory.createEntityManager();
+        Session session = manager.unwrap(org.hibernate.Session.class);
+        try
+        {
+            session.beginTransaction();
+            NoteEntity selectedNote = session.get(NoteEntity.class, noteID);
+            session.delete(selectedNote);
+            session.getTransaction().commit();
+        } finally
+        {
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
+        }*/
+        System.out.println("NOTATKA ZOSTAŁA USUNIĘTA");
     }
 
     public String getTitle()
@@ -139,22 +134,20 @@ public class Note implements INote
         this.content = content;
     }
 
-    private String inputNewContent()//TODO dodać do schematu
+    private String inputNewContent()
     {
         System.out.println("Podaj treśc notatki (aby zakończyć wpisz -END-:)");
         List<String> lines = new ArrayList<>();
         while (scanner.hasNextLine())
         {
             lines.add(scanner.nextLine());
-            if (lines.get(lines.size() - 1).equals("-END-"))
+            if (lines.get(lines.size() - 1).equalsIgnoreCase("-END-"))
             {
                 lines.remove(lines.size() - 1);
                 break;
             }
         }
         return String.join("\n", lines);
-
-
     }
 
     private String title;

@@ -2,6 +2,7 @@ package note;
 
 import entity.NoteEntity;
 import jakarta.persistence.*;
+import org.hibernate.Session;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -79,14 +80,22 @@ public class Note implements INote
 
     public void deleteNote(Long noteID)
     {
-        EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
+        jakarta.persistence.EntityManagerFactory EntityManagerFactory = Persistence.createEntityManagerFactory("default");
         EntityManager manager = EntityManagerFactory.createEntityManager();
-        manager.createNativeQuery("delete from Note where id_note = 2");
+        EntityTransaction transaction = manager.getTransaction();
+        Session s = manager.unwrap(org.hibernate.Session.class);
+
+        transaction.begin();
+        Query q = manager.createNativeQuery("SELECT * FROM Note n WHERE n.id_note = ?").setParameter(1, noteID);
+        List<NoteEntity> lista = q.getResultList();
+        manager.remove(lista.get(0));
+        manager.flush();
+        manager.clear();
+        transaction.commit();
     }
 
     public void updateNote(Long noteID)
     {
-
     }
 
     public String getTitle()

@@ -2,10 +2,10 @@ import account.Account;
 import menu.Menu;
 import note.Note;
 
-import java.util.Objects;
 
 public class Main
 {
+
     public static void main(String[] args)
     {
         Account account = new Account();
@@ -73,11 +73,10 @@ public class Main
                 case "read" ->
                 {
                     note.readNote(noteID);
-                    //TODO funkcja wyświetlająca treśc nowej notatki z klasy Note select
                 }
                 case "edit" ->
                 {
-                    //TODO funkcja umożliwiające edycję zawartości notatki w klasie Note i update
+                    note.updateNote(noteID);
                 }
                 case "delete" ->
                 {

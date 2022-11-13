@@ -95,14 +95,4 @@ public class AccountEntity
     {
         return "Id=" + idAccount + ", Login=" + login + ", password=" + password + ", name=" + name;
     }
-
-    public Collection<NoteEntity> getNotesByIdAccount()
-    {
-        return notesByIdAccount;
-    }
-
-    public void setNotesByIdAccount(Collection<NoteEntity> notesByIdAccount)
-    {
-        this.notesByIdAccount = notesByIdAccount;
-    }
 }

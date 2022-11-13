@@ -89,13 +89,9 @@ public class NoteEntity
         return result;
     }
 
-    public AccountEntity getAccountByIdAccount()
+    @Override
+    public String toString()
     {
-        return accountByIdAccount;
-    }
-
-    public void setAccountByIdAccount(AccountEntity accountByIdAccount)
-    {
-        this.accountByIdAccount = accountByIdAccount;
+        return "Id=" + idNote + ", title=" + title + ", content=" + content + ", idAccount=" + idAccount;
     }
 }

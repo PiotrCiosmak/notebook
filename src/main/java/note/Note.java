@@ -93,6 +93,21 @@ public class Note implements INote
 
     public void deleteNote(Long noteID)
     {
+        EntityManager manager = factory.createEntityManager();
+        Session session = manager.unwrap(org.hibernate.Session.class);
+        try
+        {
+            session.beginTransaction();
+            Query q = manager.createNativeQuery("DELETE FROM Note n WHERE n.id_note = ?");
+            q.setParameter(1,noteID);
+            q.executeUpdate();
+            session.getTransaction().commit();
+        } finally
+        {
+            if (session.getTransaction().isActive())
+                session.getTransaction().rollback();
+            session.close();
+        }
         //NIE DZIAŁA
         /*EntityManager manager = factory.createEntityManager();
         Session session = manager.unwrap(org.hibernate.Session.class);
@@ -152,5 +167,5 @@ public class Note implements INote
 
     private String title;
     private String content;
-    private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory("default");//TODO dodać do schematu
+    private static final EntityManagerFactory factory = Persistence.createEntityManagerFactory("default");
 }
